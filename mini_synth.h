@@ -149,6 +149,7 @@ namespace mini_synth
 		const uint8_t rowIO[3] = { PB3, PB4, PB5 };
 		const uint8_t columnIO[4] = { PB8, PB9, PB0, PB1 };
 		SAA1099 saa = SAA1099(PA3, PA5, PA7, PA0, PA1, PA2);
+		const uint8_t modeSwitchPin = PC13;
 
 		uint8_t *u8log_buffer;
 
@@ -170,11 +171,10 @@ namespace mini_synth
 			}
 		}
 
-#define CHANNEL (1)
 		void begin()
 		{
 			disableDebugPorts();
-			pinMode(PC13, INPUT);
+			pinMode(this->modeSwitchPin, INPUT);
 
 			for (int i = 0; i < this->numberOfRows; i++) {
 				for (int j = 0; j < this->numberOfColumns; j++) {
@@ -208,7 +208,7 @@ namespace mini_synth
 
 		bool isModeButtonPressed()
 		{
-			return digitalRead(PC13) == LOW;
+			return digitalRead(this->modeSwitchPin) == LOW;
 		}
 
 		int numberOfKeys()
