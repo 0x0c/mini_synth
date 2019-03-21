@@ -122,11 +122,11 @@ namespace mini_synth
 
 		Key::State currentState()
 		{
-			if (this->isPressed()) {
-				return Key::State::pressed;
-			}
 			if (this->isLongPress()) {
 				return (Key::State)(Key::State::holding | Key::State::pressed);
+			}
+			if (this->isPressed()) {
+				return Key::State::pressed;
 			}
 
 			return Key::State::release;
