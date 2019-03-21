@@ -87,7 +87,7 @@ namespace mini_synth
 		bool holdState = false;
 
 	public:
-		std::string name;
+		int identifier = 0;
 
 		typedef enum : int
 		{
@@ -99,7 +99,7 @@ namespace mini_synth
 
 		Key(int row, int column)
 		{
-			this->name = "";
+			int identifier = row + column;
 			this->row = row;
 			this->column = column;
 		}
@@ -183,8 +183,6 @@ namespace mini_synth
 				for (int j = 0; j < this->numberOfColumns; j++) {
 					auto key = this->keys[i * this->numberOfColumns + j];
 					key->setup();
-					auto name = String(i) + "-" + String(j);
-					key->name = std::string(name.c_str());
 				}
 			}
 			this->encoder.setup();
