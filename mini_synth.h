@@ -155,16 +155,13 @@ namespace mini_synth
 	public:
 		const uint8_t numberOfRows = sizeof(rowIO) / sizeof(rowIO[0]);
 		const uint8_t numberOfColumns = sizeof(columnIO) / sizeof(columnIO[0]);
-		Encoder encoder;
-		U8G2_SSD1306_128X64_NONAME_F_HW_I2C *display;
+		Encoder encoder = Encoder(PA6, PA8, PA4);
+		U8G2_SSD1306_128X64_NONAME_F_HW_I2C display = U8G2_SSD1306_128X64_NONAME_F_HW_I2C(U8G2_R0, U8X8_PIN_NONE);
 		U8G2LOG logger;
 		std::vector<mini_synth::Key *> keys;
 
 		Device()
 		{
-			this->saa = new SAA1099(PA3, PA5, PA7, PA0, PA1, PA2);
-			this->display = new U8G2_SSD1306_128X64_NONAME_F_HW_I2C(U8G2_R0, /* reset=*/U8X8_PIN_NONE);
-
 			for (int i = 0; i < this->numberOfRows; i++) {
 				for (int j = 0; j < this->numberOfColumns; j++) {
 					auto key = new Key(this->rowIO[i], this->columnIO[j]);
@@ -190,9 +187,9 @@ namespace mini_synth
 			int width = 32;
 			int height = 6;
 			this->u8log_buffer = new uint8_t[width * height];
-			this->display->begin();
-			this->display->setFont(u8g2_font_ncenB08_tr);
-			this->logger.begin(*this->display, width, height, this->u8log_buffer);
+			this->display.begin();
+			this->display.setFont(u8g2_font_ncenB08_tr);
+			this->logger.begin(this->display, width, height, this->u8log_buffer);
 			this->logger.setLineHeightOffset(0);
 			this->logger.setRedrawMode(0);
 
