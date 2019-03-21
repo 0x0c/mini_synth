@@ -62,7 +62,7 @@ namespace mini_synth
 
 		bool isPressed()
 		{
-			return digitalRead(RE_1_SW) == LOW;
+			return digitalRead(this->swPin) == LOW;
 		}
 
 		int setPosition(int position)
