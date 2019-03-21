@@ -11,44 +11,47 @@ namespace mini_synth
 	class Encoder
 	{
 	private:
-		int encoderState = LOW;
-		int previousEncoderState = LOW;
+		uint8_t previousEncoderState = 0;
 		int value = 0;
 		bool newValueAvailable = false;
+		int phaseA;
+		int phaseB;
+		int swPin;
 
 	public:
-		Encoder()
+		Encoder(int phaseA, int phaseB, int swPin)
 		{
+			this->phaseA = phaseA;
+			this->phaseB = phaseB;
+			this->swPin = swPin;
 		}
 
 		void setup()
 		{
-#define RE_1_B PA8
-#define RE_1_SW PA4
-#define RE_1_A PA6
-			pinMode(RE_1_B, INPUT);
-			pinMode(RE_1_SW, INPUT);
-			pinMode(RE_1_A, INPUT);
+			pinMode(this->phaseA, INPUT);
+			pinMode(this->phaseB, INPUT);
+			pinMode(this->swPin, INPUT);
 		}
 
 		void update()
 		{
-			if (digitalRead(RE_1_SW) == HIGH) {
-				this->encoderState = digitalRead(RE_1_A);
-				if ((this->previousEncoderState == LOW) && (this->encoderState == HIGH)) {
-					if (digitalRead(RE_1_B) == LOW) {
-						this->value--;
-					}
-					else {
-						this->value++;
-					}
-					if (this->value == 8) {
-						this->value = 0;
-					}
+			if (digitalRead(this->swPin) == HIGH) {
+				uint8_t a = digitalRead(this->phaseA);
+				uint8_t b = digitalRead(this->phaseB);
 
+				uint8_t ab = (a << 1) | b;
+				uint8_t encoded = (this->previousEncoderState << 2) | ab;
+
+				if (encoded == 0b1101 || encoded == 0b0100 || encoded == 0b0010 || encoded == 0b1011) {
 					this->newValueAvailable = true;
+					value++;
 				}
-				this->previousEncoderState = this->encoderState;
+				else if (encoded == 0b1110 || encoded == 0b0111 || encoded == 0b0001 || encoded == 0b1000) {
+					this->newValueAvailable = true;
+					value--;
+				}
+
+				this->previousEncoderState = ab;
 			}
 		}
 
