@@ -28,18 +28,13 @@ void loop()
 	}
 
 	bool silent = true;
-	for (int row = 0; row < synth.numberOfRows; row++) {
-		for (int column = 0; column < synth.numberOfColumns; column++) {
-			int index = row * 4 + column;
-			if (synth.isPressed(row, column)) {
-				int note = MIDI::shift(index, synth.encoder.position());
-				synth.play(note);
-				if (synth.isLongPress(row, column) == false) {
-					synth.logger.print(MIDI::to_string(note).c_str());
-					synth.logger.print("\n");
-				}
-				silent = false;
-			}
+	for (int i = 0; i < synth.numberOfKeys(); i++) {
+		auto state = synth.keyState(i);
+		if (state | mini_synth::Key::State::pressed) {
+			// if (synth.isKeyPressed(i)) {
+			int note = MIDI::shift_octave(i, synth.encoder.position());
+			synth.play(note);
+			silent = false;
 		}
 	}
 

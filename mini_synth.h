@@ -214,33 +214,35 @@ namespace mini_synth
 			return digitalRead(PC13) == LOW;
 		}
 
-		bool isPressed(int row, int column)
+		int numberOfKeys()
 		{
-			int index = column + (row * this->numberOfColumns);
-			if (index > this->keys.size()) {
+			return this->keys.size();
+		}
+
+		bool isKeyPressed(int keyIndex)
+		{
+			if (keyIndex > this->keys.size()) {
 				return Key::State::invalid;
 			}
-			auto key = this->keys[index];
+			auto key = this->keys[keyIndex];
 			return key->isPressed();
 		}
 
-		bool isLongPress(int row, int column)
+		bool isKeyLongPressed(int keyIndex)
 		{
-			int index = column + (row * this->numberOfColumns);
-			if (index > this->keys.size()) {
+			if (keyIndex > this->keys.size()) {
 				return Key::State::invalid;
 			}
-			auto key = this->keys[index];
+			auto key = this->keys[keyIndex];
 			return key->isLongPress();
 		}
 
-		Key::State keyState(int row, int column)
+		Key::State keyState(int keyIndex)
 		{
-			int index = column + (row * this->numberOfColumns);
-			if (index > this->keys.size()) {
+			if (keyIndex > this->keys.size()) {
 				return Key::State::invalid;
 			}
-			auto key = this->keys[index];
+			auto key = this->keys[keyIndex];
 			return key->currentState();
 		}
 
