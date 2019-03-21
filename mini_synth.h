@@ -148,7 +148,7 @@ namespace mini_synth
 	private:
 		const uint8_t rowIO[3] = { PB3, PB4, PB5 };
 		const uint8_t columnIO[4] = { PB8, PB9, PB0, PB1 };
-		SAA1099 *saa;
+		SAA1099 saa = SAA1099(PA3, PA5, PA7, PA0, PA1, PA2);
 
 		uint8_t *u8log_buffer;
 
@@ -246,24 +246,24 @@ namespace mini_synth
 			return key->currentState();
 		}
 
-		void play(uint8_t noteNumber)
+		void play(uint8_t note, int channel = 0)
 		{
-			this->saa->SetNote(CHANNEL, noteNumber);
+			this->saa.SetNote(channel, note);
 		}
 
-		void mute()
+		void mute(int channel = 0)
 		{
-			this->saa->SetVolume(CHANNEL, 0, 0);
-			this->saa->SetVolume(CHANNEL, 0, 1);
+			this->saa.SetVolume(channel, 0, 0);
+			this->saa.SetVolume(channel, 0, 1);
 		}
 
-		void reset()
+		void reset(int channel = 0)
 		{
-			this->saa->Reset();
-			this->saa->SetNoiseEnable(0);
-			this->saa->SoundEnable();
-			this->saa->SetVolume(CHANNEL, 4, 0);
-			this->saa->SetVolume(CHANNEL, 4, 1);
+			this->saa.Reset();
+			this->saa.SetNoiseEnable(0);
+			this->saa.SoundEnable();
+			this->saa.SetVolume(channel, 4, 0);
+			this->saa.SetVolume(channel, 4, 1);
 		}
 	};
 }
