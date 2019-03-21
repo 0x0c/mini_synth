@@ -55,7 +55,7 @@ namespace mini_synth
 			}
 		}
 
-		bool available()
+		bool changed()
 		{
 			return this->newValueAvailable;
 		}

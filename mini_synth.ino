@@ -20,8 +20,8 @@ void loop()
 {
 	synth.update();
 
-	if (synth.encoder.available()) {
-		auto value = MIDI::safe_octave(synth.encoder.position() - 1);
+	if (synth.encoder.changed()) {
+		auto value = MIDI::safe_octave(synth.encoder.position());
 		synth.logger.print("octave: ");
 		synth.logger.print(value);
 		synth.logger.print("\n");
