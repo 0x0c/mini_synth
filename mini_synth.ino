@@ -30,7 +30,7 @@ void loop()
 	bool silent = true;
 	for (int i = 0; i < synth.numberOfKeys(); i++) {
 		auto state = synth.keyState(i);
-		if (state | mini_synth::Key::State::pressed) {
+		if (state & mini_synth::Key::State::pressed) {
 			// if (synth.isKeyPressed(i)) {
 			int note = MIDI::shift_octave(i, synth.encoder.position());
 			synth.play(note);
