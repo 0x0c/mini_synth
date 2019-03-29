@@ -21,7 +21,7 @@ void loop()
 	synth.update();
 
 	if (synth.encoder.changed()) {
-		auto value = MIDI::safe_octave(synth.encoder.position());
+		auto value = MIDI::YamahaNote::safe_octave(synth.encoder.position());
 		synth.logger.print("octave: ");
 		synth.logger.print(value);
 		synth.logger.print("\n");
@@ -32,8 +32,9 @@ void loop()
 		auto state = synth.keyState(i);
 		if (state & mini_synth::Key::State::pressed) {
 			// if (synth.isKeyPressed(i)) {
-			int note = MIDI::shift_octave(i, synth.encoder.position());
-			synth.play(note);
+			auto note = MIDI::YamahaNote(i, synth.encoder.position());
+			synth.volume(4);
+			synth.play(note.rawValue());
 			silent = false;
 		}
 	}

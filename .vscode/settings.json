@@ -1,0 +1,19 @@
+{
+    "files.associations": {
+        "*.js": "es-beautifier",
+        "__bit_reference": "cpp",
+        "__functional_base": "cpp",
+        "algorithm": "cpp",
+        "atomic": "cpp",
+        "iterator": "cpp",
+        "limits": "cpp",
+        "memory": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "vector": "cpp",
+        "__split_buffer": "cpp",
+        "initializer_list": "cpp",
+        "string_view": "cpp",
+        "string": "cpp"
+    }
+}

@@ -44,11 +44,11 @@ namespace mini_synth
 
 				if (encoded == 0b1101 || encoded == 0b0100 || encoded == 0b0010 || encoded == 0b1011) {
 					this->newValueAvailable = true;
-					value++;
+					this->value--;
 				}
 				else if (encoded == 0b1110 || encoded == 0b0111 || encoded == 0b0001 || encoded == 0b1000) {
 					this->newValueAvailable = true;
-					value--;
+					this->value++;
 				}
 
 				this->previousEncoderState = ab;
@@ -154,8 +154,8 @@ namespace mini_synth
 		uint8_t *u8log_buffer;
 
 	public:
-		const uint8_t numberOfRows = sizeof(rowIO) / sizeof(rowIO[0]);
-		const uint8_t numberOfColumns = sizeof(columnIO) / sizeof(columnIO[0]);
+		const uint8_t numberOfRows = sizeof(this->rowIO) / sizeof(this->rowIO[0]);
+		const uint8_t numberOfColumns = sizeof(this->columnIO) / sizeof(this->columnIO[0]);
 		Encoder encoder = Encoder(PA6, PA8, PA4);
 		U8G2_SSD1306_128X64_NONAME_F_HW_I2C display = U8G2_SSD1306_128X64_NONAME_F_HW_I2C(U8G2_R0, U8X8_PIN_NONE);
 		U8G2LOG logger;
@@ -248,7 +248,18 @@ namespace mini_synth
 			this->saa.SetNote(channel, note);
 		}
 
-		void mute(int channel = 0)
+		void sideVolume(uint8_t channel = 0, uint8_t side = 0, uint8_t volume = 0)
+		{
+			this->saa.SetVolume(channel, volume, side);
+		}
+
+		void volume(uint8_t channel = 0, uint8_t volume = 0)
+		{
+			this->sideVolume(channel, 0, volume);
+			this->sideVolume(channel, 1, volume);
+		}
+
+		void mute(uint8_t channel = 0)
 		{
 			this->saa.SetVolume(channel, 0, 0);
 			this->saa.SetVolume(channel, 0, 1);
