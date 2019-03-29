@@ -67,13 +67,13 @@ namespace mini_synth
 
 		int setPosition(int position)
 		{
-			this->value = position;
+			this->value = position * 2;
 		}
 
 		int position()
 		{
 			this->newValueAvailable = false;
-			return this->value;
+			return this->value / 2;
 		}
 	};
 
