@@ -13,7 +13,7 @@ namespace mini_synth
 	private:
 		uint8_t previousEncoderState = 0;
 		int value = 0;
-		bool newValueAvailable = false;
+		bool _valueChanged = false;
 		int phaseA;
 		int phaseB;
 		int swPin;
@@ -43,11 +43,11 @@ namespace mini_synth
 				uint8_t encoded = (this->previousEncoderState << 2) | ab;
 
 				if (encoded == 0b1101 || encoded == 0b0100 || encoded == 0b0010 || encoded == 0b1011) {
-					this->newValueAvailable = true;
+					this->_valueChanged = true;
 					this->value--;
 				}
 				else if (encoded == 0b1110 || encoded == 0b0111 || encoded == 0b0001 || encoded == 0b1000) {
-					this->newValueAvailable = true;
+					this->_valueChanged = true;
 					this->value++;
 				}
 
@@ -55,9 +55,9 @@ namespace mini_synth
 			}
 		}
 
-		bool changed()
+		bool valueChanged()
 		{
-			return this->newValueAvailable;
+			return this->_valueChanged;
 		}
 
 		bool isPressed()
@@ -72,7 +72,7 @@ namespace mini_synth
 
 		int position()
 		{
-			this->newValueAvailable = false;
+			this->_valueChanged = false;
 			return this->value / 2;
 		}
 	};

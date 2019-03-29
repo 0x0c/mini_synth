@@ -20,7 +20,7 @@ void loop()
 {
 	synth.update();
 
-	if (synth.encoder.changed()) {
+	if (synth.encoder.valueChanged()) {
 		auto value = MIDI::YamahaNote::safe_octave(synth.encoder.position());
 		synth.logger.print("octave: ");
 		synth.logger.print(value);
