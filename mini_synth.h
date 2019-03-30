@@ -252,12 +252,12 @@ namespace mini_synth
 
 		void play(uint8_t note, uint8_t channel = 0)
 		{
-			this->_saa.SetNote(channel, note);
+			this->_saa.setNote(channel, note);
 		}
 
 		void sideVolume(uint8_t volume = 0, uint8_t channel = 0, AudioChannel side = AudioChannel::both)
 		{
-			this->_saa.SetVolume(channel, volume, side);
+			this->_saa.setVolume(channel, volume, side);
 		}
 
 		void volume(uint8_t volume = 0, uint8_t channel = 0)
@@ -267,17 +267,17 @@ namespace mini_synth
 
 		void mute(uint8_t channel = 0)
 		{
-			this->_saa.SetVolume(channel, 0, 0);
-			this->_saa.SetVolume(channel, 0, 1);
+			this->_saa.setVolume(channel, 0, 0);
+			this->_saa.setVolume(channel, 0, 1);
 		}
 
 		void reset(int channel = 0)
 		{
-			this->_saa.Reset();
-			this->_saa.SetNoiseEnable(0);
-			this->_saa.SoundEnable();
-			this->_saa.SetVolume(channel, 4, 0);
-			this->_saa.SetVolume(channel, 4, 1);
+			this->_saa.reset();
+			this->_saa.setNoiseEnable(0);
+			this->_saa.soundEnable();
+			this->_saa.setVolume(channel, 4, 0);
+			this->_saa.setVolume(channel, 4, 1);
 		}
 	};
 }
