@@ -180,9 +180,9 @@ namespace mini_synth
 	private:
 		const uint8_t _rowIO[3] = { PB3, PB4, PB5 };
 		const uint8_t _columnIO[4] = { PB8, PB9, PB0, PB1 };
-		SAA1099 _saa = SAA1099(PA3, PA5, PA7, PA0, PA1, PA2);
 		const uint8_t _modeSwitchPin = PC13;
 
+		SAA1099 _saa = SAA1099(PA3, PA5, PA7, PA0, PA1, PA2);
 		uint8_t *_u8log_buffer;
 
 	public:
@@ -195,6 +195,7 @@ namespace mini_synth
 
 		const uint8_t numberOfRows = sizeof(this->_rowIO) / sizeof(this->_rowIO[0]);
 		const uint8_t numberOfColumns = sizeof(this->_columnIO) / sizeof(this->_columnIO[0]);
+
 		Encoder encoder = Encoder(PA6, PA8, PA4);
 		U8G2_SSD1306_128X64_NONAME_F_HW_I2C display = U8G2_SSD1306_128X64_NONAME_F_HW_I2C(U8G2_R0, U8X8_PIN_NONE);
 		U8G2LOG logger;
@@ -298,7 +299,7 @@ namespace mini_synth
 			this->_saa.setVolume(channel, 0, 1);
 		}
 
-		void reset(int channel = 0)
+		void reset(uint8_t channel = 0)
 		{
 			this->_saa.reset();
 			this->_saa.setNoiseEnable(0);

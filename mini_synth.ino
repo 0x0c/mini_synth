@@ -46,8 +46,6 @@ void loop()
 	}
 
 	if (synth.isModeButtonPressed()) {
-		synth.reset();
-		synth.logger.print("Reset");
-		synth.logger.print("\n");
+		// Change mode
 	}
 }
