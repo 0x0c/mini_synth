@@ -11,6 +11,8 @@ void setup()
 	Serial.begin(9600);
 	Serial.println("Start");
 	synth.begin();
+	synth.encoder.setMaxValue(6);
+	synth.encoder.setMinValue(-1);
 	synth.encoder.setPosition(3);
 	synth.logger.print("Hello mini_synth");
 	synth.logger.print("\n");
@@ -20,7 +22,7 @@ void loop()
 {
 	synth.update();
 
-	if (synth.encoder.valueChanged()) {
+	if (synth.encoder.isValueChanged()) {
 		auto value = MIDI::YamahaNote::safe_octave(synth.encoder.position());
 		synth.logger.print("octave: ");
 		synth.logger.print(value);

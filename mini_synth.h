@@ -17,6 +17,9 @@ namespace mini_synth
 		int _phaseA;
 		int _phaseB;
 		int _swPin;
+		int _maxValue = INT_MAX;
+		int _minValue = INT_MIN;
+		int _stepUnit = 2;
 
 	public:
 		Encoder(int phaseA, int phaseB, int swPin)
@@ -33,29 +36,57 @@ namespace mini_synth
 			pinMode(this->_swPin, INPUT);
 		}
 
+		void setMaxValue(int maxValue)
+		{
+			this->_maxValue = maxValue;
+		}
+
+		void setMinValue(int minValue)
+		{
+			this->_minValue = minValue;
+		}
+
 		void update()
 		{
 			if (digitalRead(this->_swPin) == HIGH) {
-				uint8_t a = digitalRead(this->_phaseA);
-				uint8_t b = digitalRead(this->_phaseB);
+				// Reference https://jumbleat.com/2016/12/17/encoder_1/
+				byte currentValue = (!digitalRead(this->_phaseB) << 1) + !digitalRead(this->_phaseA);
+				byte previousValue = this->_previousEncoderState & B00000011;
+				byte direction = (this->_previousEncoderState & B00110000) >> 4;
 
-				uint8_t ab = (a << 1) | b;
-				uint8_t encoded = (this->_previousEncoderState << 2) | ab;
-
-				if (encoded == 0b1101 || encoded == 0b0100 || encoded == 0b0010 || encoded == 0b1011) {
-					this->_valueChanged = true;
-					this->_position--;
+				if (currentValue == 3) {
+					currentValue = 2;
 				}
-				else if (encoded == 0b1110 || encoded == 0b0111 || encoded == 0b0001 || encoded == 0b1000) {
-					this->_valueChanged = true;
-					this->_position++;
+				else if (currentValue == 2) {
+					currentValue = 3;
 				}
-
-				this->_previousEncoderState = ab;
+				if (currentValue != previousValue) {
+					if (direction == 0) {
+						if (currentValue == 1 || currentValue == 3) {
+							direction = currentValue;
+						}
+					}
+					else {
+						if (currentValue == 0) {
+							if (direction == 1 && previousValue == 3) {
+								this->_position -= this->_stepUnit;
+								this->_position = std::min(this->_position, this->_maxValue * this->_stepUnit);
+								this->_valueChanged = true;
+							}
+							else if (direction == 3 && previousValue == 1) {
+								this->_position += this->_stepUnit;
+								this->_position = std::max(this->_position, this->_minValue * this->_stepUnit);
+								this->_valueChanged = true;
+							}
+							direction = 0;
+						}
+					}
+					this->_previousEncoderState = (direction << 4) + (previousValue << 2) + currentValue;
+				}
 			}
 		}
 
-		bool valueChanged()
+		bool isValueChanged()
 		{
 			return this->_valueChanged;
 		}
@@ -67,13 +98,14 @@ namespace mini_synth
 
 		int setPosition(int position)
 		{
-			this->_position = position * 2;
+			this->_position = position * this->_stepUnit;
+			this->_valueChanged = true;
 		}
 
 		int position()
 		{
 			this->_valueChanged = false;
-			return this->_position / 2;
+			return this->_position / this->_stepUnit;
 		}
 	};
 
@@ -255,14 +287,9 @@ namespace mini_synth
 			this->_saa.setNote(channel, note);
 		}
 
-		void sideVolume(uint8_t volume = 0, uint8_t channel = 0, AudioChannel side = AudioChannel::both)
+		void volume(uint8_t volume = 0, AudioChannel side = AudioChannel::both, uint8_t channel = 0)
 		{
 			this->_saa.setVolume(channel, volume, side);
-		}
-
-		void volume(uint8_t volume = 0, uint8_t channel = 0)
-		{
-			this->sideVolume(volume, channel);
 		}
 
 		void mute(uint8_t channel = 0)
