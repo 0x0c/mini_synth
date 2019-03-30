@@ -45,7 +45,7 @@ void loop()
 		synth.mute();
 	}
 
-	if (synth.isModeButtonPressed()) {
+	if (synth.isFunctionKeyPressed()) {
 		// TODO: Change mode
 	}
 }

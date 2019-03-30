@@ -246,7 +246,7 @@ namespace mini_synth
 			}
 		}
 
-		bool isModeButtonPressed()
+		bool isFunctionKeyPressed()
 		{
 			return digitalRead(this->_modeSwitchPin) == LOW;
 		}
