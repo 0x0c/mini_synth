@@ -11,47 +11,47 @@ namespace mini_synth
 	class Encoder
 	{
 	private:
-		uint8_t previousEncoderState = 0;
-		int value = 0;
+		uint8_t _previousEncoderState = 0;
+		int _position = 0;
 		bool _valueChanged = false;
-		int phaseA;
-		int phaseB;
-		int swPin;
+		int _phaseA;
+		int _phaseB;
+		int _swPin;
 
 	public:
 		Encoder(int phaseA, int phaseB, int swPin)
 		{
-			this->phaseA = phaseA;
-			this->phaseB = phaseB;
-			this->swPin = swPin;
+			this->_phaseA = phaseA;
+			this->_phaseB = phaseB;
+			this->_swPin = swPin;
 		}
 
 		void setup()
 		{
-			pinMode(this->phaseA, INPUT);
-			pinMode(this->phaseB, INPUT);
-			pinMode(this->swPin, INPUT);
+			pinMode(this->_phaseA, INPUT);
+			pinMode(this->_phaseB, INPUT);
+			pinMode(this->_swPin, INPUT);
 		}
 
 		void update()
 		{
-			if (digitalRead(this->swPin) == HIGH) {
-				uint8_t a = digitalRead(this->phaseA);
-				uint8_t b = digitalRead(this->phaseB);
+			if (digitalRead(this->_swPin) == HIGH) {
+				uint8_t a = digitalRead(this->_phaseA);
+				uint8_t b = digitalRead(this->_phaseB);
 
 				uint8_t ab = (a << 1) | b;
-				uint8_t encoded = (this->previousEncoderState << 2) | ab;
+				uint8_t encoded = (this->_previousEncoderState << 2) | ab;
 
 				if (encoded == 0b1101 || encoded == 0b0100 || encoded == 0b0010 || encoded == 0b1011) {
 					this->_valueChanged = true;
-					this->value--;
+					this->_position--;
 				}
 				else if (encoded == 0b1110 || encoded == 0b0111 || encoded == 0b0001 || encoded == 0b1000) {
 					this->_valueChanged = true;
-					this->value++;
+					this->_position++;
 				}
 
-				this->previousEncoderState = ab;
+				this->_previousEncoderState = ab;
 			}
 		}
 
@@ -62,29 +62,29 @@ namespace mini_synth
 
 		bool isPressed()
 		{
-			return digitalRead(this->swPin) == LOW;
+			return digitalRead(this->_swPin) == LOW;
 		}
 
 		int setPosition(int position)
 		{
-			this->value = position * 2;
+			this->_position = position * 2;
 		}
 
 		int position()
 		{
 			this->_valueChanged = false;
-			return this->value / 2;
+			return this->_position / 2;
 		}
 	};
 
 	class Key
 	{
 	private:
-		int row;
-		int column;
-		bool pressedState = false;
-		bool previousPressedState = false;
-		bool holdState = false;
+		int _row;
+		int _column;
+		bool _pressedState = false;
+		bool _previousPressedState = false;
+		bool _holdState = false;
 
 	public:
 		int identifier = 0;
@@ -99,25 +99,25 @@ namespace mini_synth
 
 		Key(int row, int column)
 		{
-			int identifier = row + column;
-			this->row = row;
-			this->column = column;
+			this->identifier = row + column;
+			this->_row = row;
+			this->_column = column;
 		}
 
 		void setup()
 		{
-			pinMode(this->row, OUTPUT);
-			digitalWrite(this->row, HIGH);
-			pinMode(this->column, INPUT_PULLUP);
+			pinMode(this->_row, OUTPUT);
+			digitalWrite(this->_row, HIGH);
+			pinMode(this->_column, INPUT_PULLUP);
 		}
 
 		void update()
 		{
-			this->previousPressedState = this->pressedState;
-			digitalWrite(this->row, LOW);
-			this->pressedState = digitalRead(this->column) == LOW;
-			this->holdState = (this->pressedState == true) && (this->previousPressedState == true);
-			digitalWrite(this->row, HIGH);
+			this->_previousPressedState = this->_pressedState;
+			digitalWrite(this->_row, LOW);
+			this->_pressedState = digitalRead(this->_column) == LOW;
+			this->_holdState = (this->_pressedState == true) && (this->_previousPressedState == true);
+			digitalWrite(this->_row, HIGH);
 		}
 
 		Key::State currentState()
@@ -134,28 +134,35 @@ namespace mini_synth
 
 		bool isPressed()
 		{
-			return this->pressedState;
+			return this->_pressedState;
 		}
 
 		bool isLongPress()
 		{
-			return this->holdState;
+			return this->_holdState;
 		}
 	};
 
 	class Device
 	{
 	private:
-		const uint8_t rowIO[3] = { PB3, PB4, PB5 };
-		const uint8_t columnIO[4] = { PB8, PB9, PB0, PB1 };
-		SAA1099 saa = SAA1099(PA3, PA5, PA7, PA0, PA1, PA2);
-		const uint8_t modeSwitchPin = PC13;
+		const uint8_t _rowIO[3] = { PB3, PB4, PB5 };
+		const uint8_t _columnIO[4] = { PB8, PB9, PB0, PB1 };
+		SAA1099 _saa = SAA1099(PA3, PA5, PA7, PA0, PA1, PA2);
+		const uint8_t _modeSwitchPin = PC13;
 
-		uint8_t *u8log_buffer;
+		uint8_t *_u8log_buffer;
 
 	public:
-		const uint8_t numberOfRows = sizeof(this->rowIO) / sizeof(this->rowIO[0]);
-		const uint8_t numberOfColumns = sizeof(this->columnIO) / sizeof(this->columnIO[0]);
+		typedef enum : int
+		{
+			left = 0,
+			right = 1,
+			both = 2
+		} AudioChannel;
+
+		const uint8_t numberOfRows = sizeof(this->_rowIO) / sizeof(this->_rowIO[0]);
+		const uint8_t numberOfColumns = sizeof(this->_columnIO) / sizeof(this->_columnIO[0]);
 		Encoder encoder = Encoder(PA6, PA8, PA4);
 		U8G2_SSD1306_128X64_NONAME_F_HW_I2C display = U8G2_SSD1306_128X64_NONAME_F_HW_I2C(U8G2_R0, U8X8_PIN_NONE);
 		U8G2LOG logger;
@@ -165,7 +172,7 @@ namespace mini_synth
 		{
 			for (int i = 0; i < this->numberOfRows; i++) {
 				for (int j = 0; j < this->numberOfColumns; j++) {
-					auto key = new Key(this->rowIO[i], this->columnIO[j]);
+					auto key = new Key(this->_rowIO[i], this->_columnIO[j]);
 					this->keys.push_back(key);
 				}
 			}
@@ -174,7 +181,7 @@ namespace mini_synth
 		void begin()
 		{
 			disableDebugPorts();
-			pinMode(this->modeSwitchPin, INPUT);
+			pinMode(this->_modeSwitchPin, INPUT);
 
 			for (int i = 0; i < this->numberOfRows; i++) {
 				for (int j = 0; j < this->numberOfColumns; j++) {
@@ -186,10 +193,10 @@ namespace mini_synth
 
 			int width = 32;
 			int height = 6;
-			this->u8log_buffer = new uint8_t[width * height];
+			this->_u8log_buffer = new uint8_t[width * height];
 			this->display.begin();
 			this->display.setFont(u8g2_font_ncenB08_tr);
-			this->logger.begin(this->display, width, height, this->u8log_buffer);
+			this->logger.begin(this->display, width, height, this->_u8log_buffer);
 			this->logger.setLineHeightOffset(0);
 			this->logger.setRedrawMode(0);
 
@@ -208,7 +215,7 @@ namespace mini_synth
 
 		bool isModeButtonPressed()
 		{
-			return digitalRead(this->modeSwitchPin) == LOW;
+			return digitalRead(this->_modeSwitchPin) == LOW;
 		}
 
 		int numberOfKeys()
@@ -243,35 +250,34 @@ namespace mini_synth
 			return key->currentState();
 		}
 
-		void play(uint8_t note, int channel = 0)
+		void play(uint8_t note, uint8_t channel = 0)
 		{
-			this->saa.SetNote(channel, note);
+			this->_saa.SetNote(channel, note);
 		}
 
-		void sideVolume(uint8_t channel = 0, uint8_t side = 0, uint8_t volume = 0)
+		void sideVolume(uint8_t volume = 0, uint8_t channel = 0, AudioChannel side = AudioChannel::both)
 		{
-			this->saa.SetVolume(channel, volume, side);
+			this->_saa.SetVolume(channel, volume, side);
 		}
 
-		void volume(uint8_t channel = 0, uint8_t volume = 0)
+		void volume(uint8_t volume = 0, uint8_t channel = 0)
 		{
-			this->sideVolume(channel, 0, volume);
-			this->sideVolume(channel, 1, volume);
+			this->sideVolume(volume, channel);
 		}
 
 		void mute(uint8_t channel = 0)
 		{
-			this->saa.SetVolume(channel, 0, 0);
-			this->saa.SetVolume(channel, 0, 1);
+			this->_saa.SetVolume(channel, 0, 0);
+			this->_saa.SetVolume(channel, 0, 1);
 		}
 
 		void reset(int channel = 0)
 		{
-			this->saa.Reset();
-			this->saa.SetNoiseEnable(0);
-			this->saa.SoundEnable();
-			this->saa.SetVolume(channel, 4, 0);
-			this->saa.SetVolume(channel, 4, 1);
+			this->_saa.Reset();
+			this->_saa.SetNoiseEnable(0);
+			this->_saa.SoundEnable();
+			this->_saa.SetVolume(channel, 4, 0);
+			this->_saa.SetVolume(channel, 4, 1);
 		}
 	};
 }
