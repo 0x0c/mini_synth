@@ -46,6 +46,6 @@ void loop()
 	}
 
 	if (synth.isModeButtonPressed()) {
-		// Change mode
+		// TODO: Change mode
 	}
 }
