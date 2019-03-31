@@ -8,10 +8,19 @@ namespace mini_synth
 {
 	class RoterlyEncoder
 	{
+	public:
+		typedef enum : int
+		{
+			none,
+			increment,
+			decrement,
+			updated
+		} Event;
+
 	private:
 		uint8_t _previousEncoderState = 0;
 		int _position = 0;
-		bool _valueChanged = false;
+		Event _valueChanged = Event::none;
 		int _phaseA;
 		int _phaseB;
 		int _swPin;
@@ -70,13 +79,13 @@ namespace mini_synth
 								// Decriment
 								this->_position -= this->_stepUnit;
 								this->_position = std::max(this->_position, this->_minValue * this->_stepUnit);
-								this->_valueChanged = true;
+								this->_valueChanged = Event::decrement;
 							}
 							else if (direction == 3 && previousValue == 1) {
 								// Increment
 								this->_position += this->_stepUnit;
 								this->_position = std::min(this->_position, this->_maxValue * this->_stepUnit);
-								this->_valueChanged = true;
+								this->_valueChanged = Event::increment;
 							}
 							direction = 0;
 						}
@@ -86,7 +95,7 @@ namespace mini_synth
 			}
 		}
 
-		bool isValueChanged()
+		Event isValueChanged()
 		{
 			return this->_valueChanged;
 		}
@@ -99,12 +108,12 @@ namespace mini_synth
 		int setPosition(int position)
 		{
 			this->_position = position * this->_stepUnit;
-			this->_valueChanged = true;
+			this->_valueChanged = Event::updated;
 		}
 
 		int position()
 		{
-			this->_valueChanged = false;
+			this->_valueChanged = Event::none;
 			return this->_position / this->_stepUnit;
 		}
 	};

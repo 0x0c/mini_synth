@@ -1,6 +1,5 @@
 #include "mini_synth/mini_synth.h"
 
-using namespace m2d;
 using namespace bongorian;
 mini_synth::Device synth;
 mini_synth::Mode::ModeImpl *mode;
@@ -22,6 +21,10 @@ void setup()
 
 void loop()
 {
+	if (synth.encoder.isSwitchPressed()) {
+		// TODO: Change mode
+	}
+
 	mode->update();
 	mode->display();
 }
