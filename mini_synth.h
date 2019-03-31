@@ -69,13 +69,15 @@ namespace mini_synth
 					else {
 						if (currentValue == 0) {
 							if (direction == 1 && previousValue == 3) {
+								// Decriment
 								this->_position -= this->_stepUnit;
-								this->_position = std::min(this->_position, this->_maxValue * this->_stepUnit);
+								this->_position = std::max(this->_position, this->_minValue * this->_stepUnit);
 								this->_valueChanged = true;
 							}
 							else if (direction == 3 && previousValue == 1) {
+								// Increment
 								this->_position += this->_stepUnit;
-								this->_position = std::max(this->_position, this->_minValue * this->_stepUnit);
+								this->_position = std::min(this->_position, this->_maxValue * this->_stepUnit);
 								this->_valueChanged = true;
 							}
 							direction = 0;
